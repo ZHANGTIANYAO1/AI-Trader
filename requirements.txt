@@ -6,3 +6,6 @@ fastmcp==2.12.5
 # A_stock
 tushare
 efinance
+
+# Futu Trading (港股/美股)
+futu-api>=9.0.0

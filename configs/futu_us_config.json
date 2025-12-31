@@ -1,0 +1,85 @@
+{
+    "agent_type": "BaseAgentFutu",
+    "market": "US",
+    "trade_env": "SIMULATE",
+    "models": [
+        {
+            "name": "gpt-4",
+            "basemodel": "gpt-4-turbo-preview",
+            "signature": "gpt4-futu-us",
+            "enabled": true,
+            "openai_base_url": "",
+            "openai_api_key": ""
+        },
+        {
+            "name": "gpt-3.5",
+            "basemodel": "gpt-3.5-turbo",
+            "signature": "gpt35-futu-us",
+            "enabled": false,
+            "openai_base_url": "",
+            "openai_api_key": ""
+        },
+        {
+            "name": "claude",
+            "basemodel": "claude-3-5-sonnet-20241022",
+            "signature": "claude-futu-us",
+            "enabled": false,
+            "openai_base_url": "",
+            "openai_api_key": ""
+        },
+        {
+            "name": "deepseek",
+            "basemodel": "deepseek-chat",
+            "signature": "deepseek-futu-us",
+            "enabled": false,
+            "openai_base_url": "https://api.deepseek.com/v1",
+            "openai_api_key": ""
+        }
+    ],
+    "agent_config": {
+        "max_steps": 30,
+        "max_retries": 3,
+        "base_delay": 1.0,
+        "initial_cash": 50000.0
+    },
+    "futu_config": {
+        "host": "127.0.0.1",
+        "port": 11111,
+        "trade_password": "",
+        "trade_env": "SIMULATE"
+    },
+    "log_config": {
+        "log_path": "./data/agent_data_futu"
+    },
+    "stock_symbols": {
+        "HK": [
+            "00700",
+            "09988",
+            "09618",
+            "03690",
+            "09888",
+            "01810",
+            "02318",
+            "00005",
+            "00939",
+            "01398"
+        ],
+        "US": [
+            "AAPL",
+            "MSFT",
+            "GOOGL",
+            "AMZN",
+            "NVDA",
+            "META",
+            "TSLA",
+            "AMD",
+            "NFLX",
+            "BABA",
+            "JD",
+            "PDD",
+            "NIO",
+            "XPEV",
+            "LI"
+        ]
+    }
+}
