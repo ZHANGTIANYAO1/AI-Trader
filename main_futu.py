@@ -93,6 +93,23 @@ async def run_trading(config_path: str):
         print(f"{'=' * 60}")
 
         try:
+            # 获取API配置 (支持DeepSeek等不同模型)
+            model_name = model_config.get("name", "").lower()
+            if "deepseek" in model_name or "deepseek" in model_config.get("basemodel", "").lower():
+                # DeepSeek模型使用专用配置
+                api_base = model_config.get("openai_base_url") or os.getenv("DEEPSEEK_API_BASE", "https://api.deepseek.com/v1")
+                api_key = model_config.get("openai_api_key") or os.getenv("DEEPSEEK_API_KEY") or os.getenv("OPENAI_API_KEY")
+            else:
+                # 其他模型使用OpenAI配置
+                api_base = model_config.get("openai_base_url") or os.getenv("OPENAI_API_BASE")
+                api_key = model_config.get("openai_api_key") or os.getenv("OPENAI_API_KEY")
+
+            if not api_key:
+                print(f"❌ 未配置API密钥，请设置环境变量或配置文件")
+                if "deepseek" in model_name:
+                    print(f"   DeepSeek模型需要设置 DEEPSEEK_API_KEY 环境变量")
+                continue
+
             # 创建Agent
             agent = AgentClass(
                 signature=model_config["signature"],
@@ -103,8 +120,8 @@ async def run_trading(config_path: str):
                 max_steps=agent_config.get("max_steps", 30),
                 max_retries=agent_config.get("max_retries", 3),
                 base_delay=agent_config.get("base_delay", 1.0),
-                openai_base_url=model_config.get("openai_base_url") or os.getenv("OPENAI_API_BASE"),
-                openai_api_key=model_config.get("openai_api_key") or os.getenv("OPENAI_API_KEY"),
+                openai_base_url=api_base,
+                openai_api_key=api_key,
                 initial_cash=agent_config.get("initial_cash", 100000.0),
                 trade_env=trade_env,
                 verbose=True,
@@ -166,14 +183,27 @@ async def run_analysis(config_path: str, query: str):
     os.environ["FUTU_HOST"] = futu_config.get("host", "127.0.0.1")
     os.environ["FUTU_PORT"] = str(futu_config.get("port", 11111))
 
+    # 获取API配置 (支持DeepSeek等不同模型)
+    model_name = model_config.get("name", "").lower()
+    if "deepseek" in model_name or "deepseek" in model_config.get("basemodel", "").lower():
+        api_base = model_config.get("openai_base_url") or os.getenv("DEEPSEEK_API_BASE", "https://api.deepseek.com/v1")
+        api_key = model_config.get("openai_api_key") or os.getenv("DEEPSEEK_API_KEY") or os.getenv("OPENAI_API_KEY")
+    else:
+        api_base = model_config.get("openai_base_url") or os.getenv("OPENAI_API_BASE")
+        api_key = model_config.get("openai_api_key") or os.getenv("OPENAI_API_KEY")
+
+    if not api_key:
+        print(f"❌ 未配置API密钥")
+        return
+
     agent = AgentClass(
         signature=f"{model_config['signature']}-analysis",
         basemodel=model_config["basemodel"],
         market=market,
         log_path=log_path,
         max_steps=agent_config.get("max_steps", 30),
-        openai_base_url=model_config.get("openai_base_url") or os.getenv("OPENAI_API_BASE"),
-        openai_api_key=model_config.get("openai_api_key") or os.getenv("OPENAI_API_KEY"),
+        openai_base_url=api_base,
+        openai_api_key=api_key,
         trade_env="ANALYSIS_ONLY",
         verbose=True,
     )

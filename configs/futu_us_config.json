@@ -7,7 +7,7 @@
             "name": "gpt-4",
             "basemodel": "gpt-4-turbo-preview",
             "signature": "gpt4-futu-us",
-            "enabled": true,
+            "enabled": false,
             "openai_base_url": "",
             "openai_api_key": ""
         },
@@ -31,7 +31,7 @@
             "name": "deepseek",
             "basemodel": "deepseek-chat",
             "signature": "deepseek-futu-us",
-            "enabled": false,
+            "enabled": true,
             "openai_base_url": "https://api.deepseek.com/v1",
             "openai_api_key": ""
         }
