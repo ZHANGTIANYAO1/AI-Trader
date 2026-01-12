@@ -51,9 +51,40 @@ load_dotenv()
 
 
 class DeepSeekChatOpenAI(ChatOpenAI):
-    """Custom ChatOpenAI wrapper for DeepSeek API compatibility."""
+    """Custom ChatOpenAI wrapper for DeepSeek API compatibility.
+
+    Handles DeepSeek-specific message format requirements:
+    1. Converts tool_calls arguments from dict to JSON string
+    2. Ensures message content is always a string (not a list)
+    """
+
+    def _convert_messages_for_deepseek(self, messages: list) -> list:
+        """Convert messages to DeepSeek-compatible format."""
+        converted = []
+        for msg in messages:
+            # Handle different message types
+            if hasattr(msg, 'content'):
+                content = msg.content
+                # DeepSeek expects string content, not list
+                if isinstance(content, list):
+                    # Convert list content to string
+                    text_parts = []
+                    for item in content:
+                        if isinstance(item, dict):
+                            if item.get('type') == 'text':
+                                text_parts.append(item.get('text', ''))
+                            else:
+                                text_parts.append(str(item))
+                        else:
+                            text_parts.append(str(item))
+                    msg.content = '\n'.join(text_parts) if text_parts else ''
+            converted.append(msg)
+        return converted
 
     def _generate(self, messages: list, stop: Optional[list] = None, **kwargs):
+        # Pre-process messages for DeepSeek compatibility
+        messages = self._convert_messages_for_deepseek(messages)
+
         result = super()._generate(messages, stop, **kwargs)
         for generation in result.generations:
             for gen in generation:
@@ -71,6 +102,9 @@ class DeepSeekChatOpenAI(ChatOpenAI):
         return result
 
     async def _agenerate(self, messages: list, stop: Optional[list] = None, **kwargs):
+        # Pre-process messages for DeepSeek compatibility
+        messages = self._convert_messages_for_deepseek(messages)
+
         result = await super()._agenerate(messages, stop, **kwargs)
         for generation in result.generations:
             for gen in generation:
